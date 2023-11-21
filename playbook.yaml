@@ -1,0 +1,71 @@
+- name: Install backend servers and nginx load balancer
+  hosts: backend
+  become: true
+  tasks:
+    - name: Install httpd
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start and enable httpd service
+      service:
+        name: httpd
+        state: started
+        enabled: true
+
+- name: Install nginx load balancer
+  hosts: load_balancer
+  become: true
+  tasks:
+    - name: Install nginx
+      yum:
+        name: nginx
+        state: present
+      
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+
+    - name: Configure nginx
+      copy:
+        src: nginx.conf
+        dest: /etc/nginx/nginx.conf
+      notify: restart nginx
+
+    - name: Create SSL directory
+      file:
+        path: /etc/nginx/ssl
+        state: directory
+
+    - name: Move SSL certificate files
+      copy:
+        src: mycert.cert
+        dest: /etc/nginx/ssl/mycert.cert
+        mode: '0644'
+      notify: restart nginx
+
+    - name: Move SSL private key file
+      copy:
+        src: server.key
+        dest: /etc/nginx/ssl/server.key
+        mode: '0600'
+      notify: restart nginx
+
+- name: Copy website files to backend servers
+  hosts: backend
+  become: true
+  tasks:
+    - name: Copy website files
+      copy:
+        src:  web/
+        dest: /var/www/html/
+#        remote_src: true
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted

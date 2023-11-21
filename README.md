@@ -9,8 +9,8 @@ This playbook installs and configures two backend servers running httpd and one 
 
 ## How to use
 - Edit the `inventory` file and specify the IP addresses of the hosts under the `[nginx]` and `[httpd]` groups.
-- Edit the `vars.yml` file and specify the path to the SSL certificate and key files for nginx under the `ssl_cert` and `ssl_key` variables.
-- Run the playbook with the command: `ansible-playbook -i inventory main.yml`
+- Edit the `configure nginx` file and specify the path to the SSL certificate and key files for nginx under the `mycert.cert` and `server.key` file.
+- Run the playbook with the command: `ansible-playbook playbook.yaml`
 
 ## How it works
 - The playbook consists of two roles: `nginx` and `httpd`.
